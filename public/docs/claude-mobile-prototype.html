@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Version Diff · Claude mobile prototype</title>
+<style>
+  :root {
+    --ivory: #faf9f5;
+    --ivory-2: #f4f1ea;
+    --paper: #ffffff;
+    --ink: #1a1915;
+    --ink-2: #3f3d38;
+    --ink-3: #6b6862;
+    --hairline: #e2ded2;
+    --hairline-soft: #ecead8;
+    --coral: #d97757;
+    --coral-soft: #f2ddd0;
+    --coral-hl: #f7e6da;
+    --sage: #6b7a5a;
+    --sage-soft: #dde3d3;
+    --sage-hl: #e6ecdd;
+    --red-soft: #f5dcdc;
+    --red: #b95c5c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    background: var(--ivory-2);
+    color: var(--ink);
+    font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; }
+
+  /* On a phone the app fills the screen. On a wider screen it sits inside a phone-sized frame. */
+  .stage { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+  .phone { position: relative; width: 100%; height: 100vh; height: 100dvh; background: var(--ivory); overflow: hidden; }
+  .caption { display: none; }
+  @media (min-width: 520px) {
+    .stage { padding: 24px; }
+    .phone { width: 390px; height: 780px; max-height: calc(100vh - 90px); border-radius: 36px; border: 10px solid var(--ink); box-shadow: 0 20px 60px rgba(26,25,21,0.25); }
+    .caption { display: block; max-width: 390px; text-align: center; font-size: 12px; color: var(--ink-3); }
+  }
+
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--ivory); }
+  .artifact-screen { background: var(--paper); transform: translateX(100%); transition: transform 0.25s ease; z-index: 20; }
+  .artifact-screen.open { transform: translateX(0); }
+
+  .topbar { display: flex; align-items: center; gap: 10px; padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; border-bottom: 1px solid var(--hairline); background: var(--ivory); min-height: 58px; }
+  .icon-btn { width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; border: 1px solid var(--hairline); background: var(--paper); font-size: 18px; color: var(--ink-2); cursor: pointer; }
+  .topbar-main { flex: 1; min-width: 0; }
+  .topbar-title { font-family: 'Charter', Georgia, serif; font-size: 15.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-sub { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+  .model-chip { font-size: 10.5px; color: var(--ink-3); padding: 3px 9px; border: 1px solid var(--hairline); border-radius: 12px; background: var(--paper); flex-shrink: 0; }
+
+  /* Chat */
+  .chat-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 16px 24px; }
+  .msg { margin-bottom: 18px; }
+  .msg-role { font-size: 10px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 5px; }
+  .msg.user .msg-body { background: var(--ivory-2); padding: 11px 14px; border-radius: 12px; font-size: 14.5px; line-height: 1.5; }
+  .msg.assistant .msg-body { font-family: 'Charter', Georgia, serif; font-size: 15.5px; line-height: 1.6; }
+  .artifact-chip { display: flex; align-items: center; gap: 10px; background: var(--paper); border: 1px solid var(--hairline); border-radius: 12px; padding: 11px 12px; margin-top: 10px; cursor: pointer; }
+  .artifact-chip:active { background: var(--ivory-2); }
+  .artifact-icon { width: 32px; height: 32px; flex-shrink: 0; background: var(--coral-soft); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--coral); font-weight: 700; }
+  .artifact-chip-text { flex: 1; min-width: 0; }
+  .artifact-chip-title { font-size: 13.5px; font-weight: 600; font-family: 'Charter', Georgia, serif; }
+  .artifact-chip-sub { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+  .chip-download-btn { flex-shrink: 0; width: 40px; height: 40px; background: var(--paper); border: 1px solid var(--hairline); border-radius: 10px; font-size: 14px; color: var(--ink-2); cursor: pointer; }
+
+  .composer { display: flex; gap: 8px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--hairline); background: var(--ivory); }
+  .composer input { flex: 1; min-width: 0; height: 44px; background: var(--paper); border: 1px solid var(--hairline); border-radius: 22px; padding: 0 16px; font-size: 16px; font-family: inherit; color: var(--ink); outline: none; }
+  .composer button { height: 44px; padding: 0 18px; background: var(--ink); color: var(--ivory); border: none; border-radius: 22px; font-size: 14px; font-weight: 500; cursor: pointer; }
+
+  /* Artifact screen */
+  .toolbar { display: flex; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--hairline); background: var(--ivory); }
+  .ctrl-btn { flex: 1; min-height: 42px; font-size: 13px; padding: 0 12px; border: 1px solid var(--hairline); background: var(--paper); color: var(--ink-2); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .ctrl-btn.active { background: var(--ink); color: var(--ivory); border-color: var(--ink); }
+  .history-badge { background: var(--coral); color: var(--paper); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 8px; }
+
+  .compare-banner { display: none; flex-direction: column; gap: 8px; padding: 10px 14px; background: var(--coral-hl); border-bottom: 1px solid var(--coral-soft); font-size: 12.5px; color: var(--ink-2); }
+  .compare-banner.show { display: flex; }
+  .compare-banner strong { color: var(--coral); }
+  .cb-actions { display: flex; gap: 8px; }
+  .cb-actions .ctrl-btn { min-height: 40px; background: var(--paper); }
+
+  .static-note { display: none; margin: 12px 14px 0; padding: 11px 13px; background: var(--ivory-2); border: 1px solid var(--hairline-soft); border-radius: 10px; font-size: 12.5px; color: var(--ink-3); }
+
+  .artifact-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 14px 28px; }
+  .version-flash { display: none; background: var(--sage-hl); border: 1px solid var(--sage-soft); color: var(--sage); font-size: 13px; font-weight: 600; padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; text-align: center; }
+  .version-flash.show { display: block; animation: flashFade 3.4s ease forwards; }
+  @keyframes flashFade { 0% { opacity: 0; transform: translateY(-4px); } 10% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; } }
+
+  .artifact-doc { font-family: 'Charter', Georgia, serif; font-size: 15px; line-height: 1.7; }
+  .doc-h1 { font-size: 21px; font-weight: 600; margin-bottom: 12px; line-height: 1.3; }
+  .doc-section { margin-bottom: 8px; padding: 13px 14px; border-radius: 12px; border: 1px solid transparent; transition: background 0.15s; }
+  .doc-section.changed { background: var(--ivory-2); border-color: var(--hairline); }
+  .doc-section.changed.decided-accept { background: var(--sage-hl); border-color: var(--sage-soft); }
+  .doc-section.changed.decided-reject { background: var(--red-soft); border-color: #e0bdbd; }
+  .doc-section-label { font-family: -apple-system, 'Segoe UI', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--coral); margin-bottom: 6px; }
+  .doc-section-heading { font-weight: 600; font-size: 16px; margin-bottom: 6px; }
+  .del-text { color: var(--red); text-decoration: line-through; background: rgba(185,92,92,0.08); }
+  .add-text { color: var(--sage); background: rgba(107,122,90,0.12); font-weight: 500; }
+
+  /* Keep new / Keep old: full-width and stacked so they are easy to hit with a thumb */
+  .section-actions { display: none; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .doc-section.changed .section-actions.show { display: flex; }
+  .sec-btn { width: 100%; min-height: 46px; font-size: 14px; font-weight: 500; border: 1px solid var(--hairline); background: var(--paper); color: var(--ink-2); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .sec-btn.keep-new.picked { background: var(--sage); border-color: var(--sage); color: var(--paper); }
+  .sec-btn.keep-old.picked { background: var(--red); border-color: var(--red); color: var(--paper); }
+  .decision-tag { display: none; font-family: -apple-system, 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 10px; margin-top: 10px; }
+  .decision-tag.show { display: inline-block; }
+  .decision-tag.accepted { background: var(--sage); color: var(--paper); }
+  .decision-tag.rejected { background: var(--red); color: var(--paper); }
+  .rescope-box { display: none; margin-top: 10px; background: var(--paper); border: 1px solid var(--hairline); border-radius: 10px; padding: 4px 12px; }
+  .rescope-box.show { display: block; }
+  .rescope-box input { width: 100%; height: 42px; border: none; outline: none; font-size: 16px; font-family: -apple-system, 'Segoe UI', Arial, sans-serif; color: var(--ink); background: transparent; }
+
+  .bottom-bar { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--hairline); background: var(--ivory-2); }
+  .bar-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .footer-note { font-size: 12px; color: var(--ink-3); }
+  .reset-link { font-size: 11.5px; color: var(--ink-3); background: none; border: none; text-decoration: underline; cursor: pointer; padding: 6px 0; }
+  .confirm-btn { width: 100%; min-height: 48px; font-size: 15px; font-weight: 600; background: var(--coral); color: var(--paper); border: none; border-radius: 12px; cursor: pointer; }
+  .confirm-btn:disabled { background: var(--hairline); color: var(--ink-3); cursor: not-allowed; }
+
+  /* Drawer (chat list) */
+  .backdrop { position: absolute; inset: 0; background: rgba(26,25,21,0.4); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .backdrop.show { opacity: 1; pointer-events: auto; }
+  #drawerBackdrop { z-index: 30; }
+  #sheetBackdrop { z-index: 50; }
+  .drawer { position: absolute; top: 0; bottom: 0; left: 0; width: 80%; max-width: 310px; background: var(--ivory-2); border-right: 1px solid var(--hairline); padding: calc(18px + env(safe-area-inset-top, 0px)) 14px 18px; transform: translateX(-100%); transition: transform 0.25s ease; z-index: 40; display: flex; flex-direction: column; gap: 4px; }
+  .drawer.show { transform: translateX(0); }
+  .brand { display: flex; align-items: center; gap: 8px; padding: 4px 8px 16px; font-family: 'Charter', Georgia, serif; font-size: 18px; font-weight: 600; }
+  .brand-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--coral); display: inline-block; }
+  .new-chat { background: var(--paper); border: 1px solid var(--hairline); padding: 12px; font-size: 14px; color: var(--ink-2); text-align: left; cursor: pointer; border-radius: 10px; margin-bottom: 10px; }
+  .side-label { font-size: 10.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 8px 4px; font-weight: 600; }
+  .side-item { padding: 13px 12px; font-size: 14px; color: var(--ink-2); border-radius: 10px; cursor: pointer; }
+  .side-item.active { background: var(--paper); color: var(--ink); font-weight: 600; }
+
+  /* Version history bottom sheet */
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 72%; background: var(--ivory-2); border-radius: 20px 20px 0 0; box-shadow: 0 -8px 30px rgba(26,25,21,0.18); transform: translateY(100%); transition: transform 0.28s ease; z-index: 60; display: flex; flex-direction: column; }
+  .sheet.show { transform: translateY(0); }
+  .sheet-grab { width: 40px; height: 4px; border-radius: 2px; background: var(--hairline); margin: 10px auto 0; }
+  .sheet-header { padding: 12px 18px; font-family: 'Charter', Georgia, serif; font-size: 16px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--hairline); }
+  .sheet-close { background: none; border: none; font-size: 20px; color: var(--ink-3); width: 40px; height: 40px; cursor: pointer; }
+  .history-list { flex: 1; overflow-y: auto; padding: 12px 14px calc(16px + env(safe-area-inset-bottom, 0px)); }
+  .history-item { background: var(--paper); border: 1px solid var(--hairline); border-radius: 12px; padding: 13px 14px; margin-bottom: 10px; }
+  .history-item.current { border-color: var(--coral); background: var(--coral-hl); }
+  .history-item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .history-item-title { font-size: 14px; font-weight: 600; }
+  .history-item-tag { font-size: 10px; font-weight: 700; color: var(--coral); background: var(--coral-soft); padding: 2px 8px; border-radius: 8px; }
+  .history-item-sub { font-size: 12.5px; color: var(--ink-3); line-height: 1.4; }
+  .history-item-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .hist-btn { flex: 1; min-height: 42px; font-size: 13px; border: 1px solid var(--hairline); background: var(--paper); color: var(--ink-2); border-radius: 10px; cursor: pointer; }
+
+  .toast { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); width: max-content; max-width: 88%; background: var(--ink); color: var(--ivory); padding: 10px 16px; border-radius: 10px; font-size: 13px; text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 100; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="stage">
+<div class="phone" id="phone">
+
+  <!-- Screen 1: chat -->
+  <section class="screen" id="screen-chat">
+    <header class="topbar">
+      <button class="icon-btn" onclick="openDrawer()" aria-label="Open chats">☰</button>
+      <div class="topbar-main"><div class="topbar-title" id="chatTitleText">Q4 client recommendation memo</div></div>
+      <span class="model-chip">Sonnet 4.6</span>
+    </header>
+
+    <div class="chat-scroll" id="chatScroll">
+
+      <div class="messages" id="messages-memo">
+        <div class="msg user">
+          <div class="msg-role">You</div>
+          <div class="msg-body">Draft a short recommendation memo for the client on moving to the new vendor. Keep it to an intro, the recommendation, and next steps.</div>
+        </div>
+        <div class="msg assistant">
+          <div class="msg-role">Claude</div>
+          <div class="msg-body">
+            <p>Here's a first draft of the memo.</p>
+            <div class="artifact-chip" onclick="openArtifact()">
+              <div class="artifact-icon">M</div>
+              <div class="artifact-chip-text">
+                <div class="artifact-chip-title">Client Recommendation Memo</div>
+                <div class="artifact-chip-sub">Document · v1</div>
+              </div>
+              <button class="chip-download-btn" onclick="event.stopPropagation(); downloadVersion(1, 'memo')" aria-label="Download version 1">⬇</button>
+            </div>
+          </div>
+        </div>
+        <div class="msg user">
+          <div class="msg-role">You</div>
+          <div class="msg-body">Good start. Can you tighten the recommendation section, make it punchier and more direct, and soften the tone in the intro a little, it reads too formal.</div>
+        </div>
+        <div class="msg assistant">
+          <div class="msg-role">Claude</div>
+          <div class="msg-body">
+            <p>Updated the recommendation section and softened the intro's tone. Tap the memo to review what changed, section by section, before it's finalized.</p>
+            <div class="artifact-chip" onclick="openArtifact()">
+              <div class="artifact-icon">M</div>
+              <div class="artifact-chip-text">
+                <div class="artifact-chip-title">Client Recommendation Memo</div>
+                <div class="artifact-chip-sub">Document · v2 · 2 sections changed · tap to review</div>
+              </div>
+              <button class="chip-download-btn" onclick="event.stopPropagation(); downloadVersion(2, 'memo')" aria-label="Download version 2">⬇</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="messages" id="messages-hiring" style="display:none;"></div>
+      <div class="messages" id="messages-pricing" style="display:none;"></div>
+      <div class="messages" id="messages-feedback" style="display:none;"></div>
+
+    </div>
+
+    <div class="composer">
+      <input type="text" id="composerInput" placeholder="Ask a follow-up…" aria-label="Message">
+      <button onclick="sendDemo()">Send</button>
+    </div>
+  </section>
+
+  <!-- Screen 2: the document, full screen -->
+  <section class="screen artifact-screen" id="screen-artifact">
+    <header class="topbar">
+      <button class="icon-btn" onclick="closeArtifact()" aria-label="Back to chat">←</button>
+      <div class="topbar-main">
+        <div class="topbar-title" id="artifactHeaderTitle">Client Recommendation Memo</div>
+        <div class="topbar-sub" id="versionLabel">Version 2 of 2</div>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <button class="ctrl-btn active" id="compareToggle" onclick="toggleCompare()">Compare <span class="history-badge" id="pendingBadge">2</span></button>
+      <button class="ctrl-btn" onclick="toggleHistory()">History</button>
+      <button class="ctrl-btn" onclick="downloadCurrentVersion()">⬇ Save</button>
+    </div>
+
+    <div class="compare-banner show" id="compareBanner">
+      <div>Comparing <strong>Version 2</strong> against <strong>Version 1</strong>. 2 sections changed.</div>
+      <div class="cb-actions">
+        <button class="ctrl-btn" onclick="acceptAllChanges()">Accept all</button>
+        <button class="ctrl-btn" onclick="rejectAllChanges()">Reject all</button>
+      </div>
+    </div>
+
+    <div class="static-note" id="staticNote"></div>
+
+    <div class="artifact-body" id="artifactBody">
+      <div class="version-flash" id="versionFlash"></div>
+
+      <div class="artifact-doc" id="doc-memo">
+        <div class="doc-h1">Recommendation: Vendor Transition</div>
+
+        <div class="doc-section changed" id="section-intro">
+          <div class="doc-section-label">Intro · changed</div>
+          <div class="doc-section-heading">Overview</div>
+          <p>
+            <span class="del-text">Pursuant to our review of available vendor options and a comprehensive analysis of your current infrastructure needs, we have arrived at a recommendation regarding vendor transition.</span>
+            <span class="add-text">After digging into your infrastructure needs and comparing vendors, here's where we've landed on the transition.</span>
+          </p>
+          <div class="section-actions show">
+            <button class="sec-btn keep-new" onclick="decideSection('intro', 'new', this)">Keep new</button>
+            <button class="sec-btn keep-old" onclick="decideSection('intro', 'old', this)">Keep old</button>
+          </div>
+          <div class="decision-tag" id="tag-intro"></div>
+        </div>
+
+        <div class="doc-section unchanged">
+          <div class="doc-section-heading">Current State</div>
+          <p>Your team currently operates on Vendor A's platform, onboarded in 2023. Support tickets have increased 40% over the last two quarters, largely tied to integration failures with your CRM.</p>
+        </div>
+
+        <div class="doc-section changed" id="section-rec">
+          <div class="doc-section-label">Recommendation · changed</div>
+          <div class="doc-section-heading">Recommendation</div>
+          <p>
+            <span class="del-text">Taking into consideration the various factors outlined above, including cost, integration compatibility, and support responsiveness, it would be advisable to consider transitioning to Vendor B at a time that is most convenient and appropriate for your organization's broader planning cycle.</span>
+            <span class="add-text">Move to Vendor B. It's the strongest fit on cost, integration, and support responsiveness, and we'd recommend starting the transition next quarter.</span>
+          </p>
+          <div class="section-actions show">
+            <button class="sec-btn keep-new" onclick="decideSection('rec', 'new', this)">Keep new</button>
+            <button class="sec-btn keep-old" onclick="decideSection('rec', 'old', this)">Keep old</button>
+          </div>
+          <div class="decision-tag" id="tag-rec"></div>
+          <div class="rescope-box" id="rescope-rec">
+            <input type="text" placeholder="Tell Claude what to change here instead…" />
+          </div>
+        </div>
+
+        <div class="doc-section unchanged">
+          <div class="doc-section-heading">Next Steps</div>
+          <p>1. Schedule a kickoff call with Vendor B's onboarding team.<br>
+          2. Run a 2-week parallel test alongside the current CRM integration.<br>
+          3. Set a go-live date contingent on parallel test results.</p>
+        </div>
+      </div>
+
+      <div class="artifact-doc" id="doc-hiring" style="display:none;"></div>
+      <div class="artifact-doc" id="doc-pricing" style="display:none;"></div>
+      <div class="artifact-doc" id="doc-feedback" style="display:none;"></div>
+    </div>
+
+    <div class="bottom-bar" id="artifactFooter">
+      <div class="bar-row">
+        <span class="footer-note" id="footerNote">2 sections awaiting your decision</span>
+        <button class="reset-link" id="resetLink" onclick="resetDemo()">↺ Reset demo</button>
+      </div>
+      <button class="confirm-btn" id="confirmBtn" disabled onclick="confirmChanges()">Confirm changes</button>
+    </div>
+  </section>
+
+  <!-- Chat list drawer -->
+  <div class="backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+  <aside class="drawer" id="drawer">
+    <div class="brand"><span class="brand-dot"></span>Claude</div>
+    <button class="new-chat" onclick="newChatDemo()">+ New chat</button>
+    <div class="side-label">Recent</div>
+    <div class="side-item active" id="side-memo" onclick="switchConversation('memo')">Q4 client recommendation memo</div>
+    <div class="side-item" id="side-hiring" onclick="switchConversation('hiring')">Team hiring plan draft</div>
+    <div class="side-item" id="side-pricing" onclick="switchConversation('pricing')">Pricing model comparison</div>
+    <div class="side-item" id="side-feedback" onclick="switchConversation('feedback')">Product feedback synthesis</div>
+  </aside>
+
+  <!-- Version history bottom sheet -->
+  <div class="backdrop" id="sheetBackdrop" onclick="closeHistory()"></div>
+  <div class="sheet" id="historySheet">
+    <div class="sheet-grab"></div>
+    <div class="sheet-header">Version History <button class="sheet-close" onclick="closeHistory()" aria-label="Close history">✕</button></div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+</div>
+<div class="caption">Mobile prototype. On a computer this is a phone-sized preview; open the link on your phone for the full-screen version.</div>
+</div>
+
+<script>
+  // ---------------------------------------------------------------
+  // State and content (same content and logic as the desktop prototype)
+  // ---------------------------------------------------------------
+  let decisions = { intro: null, rec: null };
+  let pendingCount = 2;
+  let memoFinalized = false;
+
+  const TEXT = {
+    heading: "Recommendation: Vendor Transition",
+    introOld: "Pursuant to our review of available vendor options and a comprehensive analysis of your current infrastructure needs, we have arrived at a recommendation regarding vendor transition.",
+    introNew: "After digging into your infrastructure needs and comparing vendors, here's where we've landed on the transition.",
+    currentState: "Your team currently operates on Vendor A's platform, onboarded in 2023. Support tickets have increased 40% over the last two quarters, largely tied to integration failures with your CRM.",
+    recOld: "Taking into consideration the various factors outlined above, including cost, integration compatibility, and support responsiveness, it would be advisable to consider transitioning to Vendor B at a time that is most convenient and appropriate for your organization's broader planning cycle.",
+    recNew: "Move to Vendor B. It's the strongest fit on cost, integration, and support responsiveness, and we'd recommend starting the transition next quarter.",
+    nextSteps: "1. Schedule a kickoff call with Vendor B's onboarding team.\n2. Run a 2-week parallel test alongside the current CRM integration.\n3. Set a go-live date contingent on parallel test results.",
+  };
+
+  const SIMPLE_DOCS = {
+    hiring: {
+      title: 'Q4 Hiring Plan',
+      v1: "Roles\nWe are opening three roles this quarter: a senior backend engineer, a DevOps engineer, and a technical program manager.\n\nHeadcount Justification\nThe team has grown scope significantly this year and needs additional capacity.\n\nTimeline\nTarget start dates are staggered across Q4, with the backend role starting first.",
+      v2: "Roles\nWe are opening three roles this quarter: a senior backend engineer, a DevOps engineer, and a technical program manager.\n\nHeadcount Justification\nPlatform incident load has grown 3x since Q1 while headcount has stayed flat. These three roles directly reduce on-call burden and unblock two stalled infrastructure projects.\n\nTimeline\nBackend engineer role starts October 1st. DevOps and TPM roles start with a two-week buffer in November to allow onboarding overlap with the backend hire.",
+      v1desc: "Original draft: roles, headcount, timeline.",
+      v2desc: "Added a timeline buffer and a clearer, data-backed headcount justification for finance.",
+    },
+    pricing: {
+      title: 'Pricing Model Comparison',
+      v1: "Overview\nThis compares our Starter, Growth, and Enterprise tiers against Competitor A and Competitor B.\n\nSummary\nOur Growth tier is priced similarly to competitors but includes fewer seats by default, which may be a disadvantage in deals under 20 seats.",
+      v2: "Overview\nThis compares our Starter, Growth, and Enterprise tiers against Competitor A and Competitor B.\n\nSummary\nOur Growth tier matches competitors on price but trails on default seat count for deals under 20 seats.\n\nRecommendation\nRaise the default seat count on Growth from 5 to 8. This closes the gap with Competitor A at negligible cost and removes the most common objection raised in the last two lost deals.",
+      v1desc: "Initial comparison against Competitor A and B.",
+      v2desc: "Added a recommendation and tightened the summary.",
+    },
+    feedback: {
+      title: 'Product Feedback Synthesis',
+      v1: "Themes\nUsers mentioned slow load times on the dashboard, confusion around the export button, and a request for dark mode.\n\nNotes\nFeedback was collected from 40 support tickets and 12 interview notes.",
+      v2: "Themes, by severity\n1. Slow dashboard load times, high severity, affects daily active use.\n2. Confusion around the export button, medium severity, workaround exists but generates support tickets.\n3. Dark mode request, low severity, frequently requested but not blocking anyone.\n\nNotes\nFeedback was collected from 40 support tickets and 12 interview notes.",
+      v1desc: "Initial theme list from August feedback.",
+      v2desc: "Reordered by severity and added a severity rating to each theme.",
+    },
+  };
+
+  const CHAT_SCRIPTS = {
+    hiring: {
+      userMsg1: "Draft a hiring plan for Q4 covering the 3 open roles on the platform team.",
+      claudeMsg1: "Here's a first draft of the hiring plan.",
+      userMsg2: "Add a timeline buffer, and make the headcount justification clearer for finance.",
+      claudeMsg2: "Updated with a timeline buffer and a clearer, data-backed headcount justification.",
+    },
+    pricing: {
+      userMsg1: "Put together a comparison of our three pricing tiers against the two main competitors.",
+      claudeMsg1: "Here's the pricing comparison.",
+      userMsg2: "Add a recommendation at the end, and tighten the summary.",
+      claudeMsg2: "Added a recommendation and tightened the summary.",
+    },
+    feedback: {
+      userMsg1: "Summarize the top themes from last month's user feedback.",
+      claudeMsg1: "Here's the synthesis.",
+      userMsg2: "Add the severity of each theme and reorder by that.",
+      claudeMsg2: "Reordered by severity and added a severity rating to each theme.",
+    },
+  };
+
+  const convState = {
+    memo: {
+      chatTitle: 'Q4 client recommendation memo',
+      docTitle: 'Client Recommendation Memo',
+      interactive: true,
+      versionCounter: 2,
+      currentVersion: 2,
+      versionHistory: [
+        { num: 2, desc: "Tightened recommendation, softened intro tone. 2 sections changed from v1." },
+        { num: 1, desc: "Original draft. Intro, recommendation, next steps." },
+      ],
+      versionRegistry: { 1: { intro: 'old', rec: 'old' }, 2: { intro: 'new', rec: 'new' } },
+    },
+    hiring: {
+      chatTitle: 'Team hiring plan draft',
+      docTitle: SIMPLE_DOCS.hiring.title,
+      interactive: false,
+      versionCounter: 2,
+      currentVersion: 2,
+      versionHistory: [
+        { num: 2, desc: SIMPLE_DOCS.hiring.v2desc },
+        { num: 1, desc: SIMPLE_DOCS.hiring.v1desc },
+      ],
+      versionRegistry: { 1: SIMPLE_DOCS.hiring.v1, 2: SIMPLE_DOCS.hiring.v2 },
+    },
+    pricing: {
+      chatTitle: 'Pricing model comparison',
+      docTitle: SIMPLE_DOCS.pricing.title,
+      interactive: false,
+      versionCounter: 2,
+      currentVersion: 2,
+      versionHistory: [
+        { num: 2, desc: SIMPLE_DOCS.pricing.v2desc },
+        { num: 1, desc: SIMPLE_DOCS.pricing.v1desc },
+      ],
+      versionRegistry: { 1: SIMPLE_DOCS.pricing.v1, 2: SIMPLE_DOCS.pricing.v2 },
+    },
+    feedback: {
+      chatTitle: 'Product feedback synthesis',
+      docTitle: SIMPLE_DOCS.feedback.title,
+      interactive: false,
+      versionCounter: 2,
+      currentVersion: 2,
+      versionHistory: [
+        { num: 2, desc: SIMPLE_DOCS.feedback.v2desc },
+        { num: 1, desc: SIMPLE_DOCS.feedback.v1desc },
+      ],
+      versionRegistry: { 1: SIMPLE_DOCS.feedback.v1, 2: SIMPLE_DOCS.feedback.v2 },
+    },
+  };
+
+  let activeConv = 'memo';
+
+  // Pristine snapshots so "Reset demo" restores the memo conversation exactly.
+  const ORIGINAL_DOC_MEMO_HTML = document.getElementById('doc-memo').innerHTML;
+  const ORIGINAL_MESSAGES_MEMO_HTML = document.getElementById('messages-memo').innerHTML;
+
+  // ---------------------------------------------------------------
+  // Navigation: drawer, artifact screen, history sheet
+  // ---------------------------------------------------------------
+  function openDrawer() {
+    document.getElementById('drawer').classList.add('show');
+    document.getElementById('drawerBackdrop').classList.add('show');
+  }
+  function closeDrawer() {
+    document.getElementById('drawer').classList.remove('show');
+    document.getElementById('drawerBackdrop').classList.remove('show');
+  }
+  function openArtifact() {
+    document.getElementById('screen-artifact').classList.add('open');
+  }
+  function closeArtifact() {
+    closeHistory();
+    document.getElementById('screen-artifact').classList.remove('open');
+  }
+  function openHistory() {
+    renderHistoryList();
+    document.getElementById('historySheet').classList.add('show');
+    document.getElementById('sheetBackdrop').classList.add('show');
+  }
+  function closeHistory() {
+    document.getElementById('historySheet').classList.remove('show');
+    document.getElementById('sheetBackdrop').classList.remove('show');
+  }
+  function toggleHistory() {
+    if (document.getElementById('historySheet').classList.contains('show')) closeHistory();
+    else openHistory();
+  }
+
+  function newChatDemo() {
+    closeDrawer();
+    showToast('This prototype focuses on version review. Open a chat from the list to try it.');
+  }
+  function sendDemo() {
+    const input = document.getElementById('composerInput');
+    input.value = '';
+    showToast('Messaging is not part of this demo. Tap the document card to review changes.');
+  }
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  function flashVersionBanner(text) {
+    const el = document.getElementById('versionFlash');
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.textContent = text;
+    el.classList.add('show');
+    const body = document.getElementById('artifactBody');
+    if (body) body.scrollTop = 0;
+  }
+
+  // ---------------------------------------------------------------
+  // Rendering helpers for the three already-resolved conversations
+  // ---------------------------------------------------------------
+  function renderSimpleDoc(key, n) {
+    const cs = convState[key];
+    const doc = document.getElementById('doc-' + key);
+    const bodyText = cs.versionRegistry[n];
+    const blocks = bodyText.split('\n\n').map(block => {
+      const lines = block.split('\n');
+      const heading = lines[0];
+      const rest = lines.slice(1).join('<br>');
+      return `<div class="doc-section unchanged"><div class="doc-section-heading">${heading}</div><p>${rest}</p></div>`;
+    }).join('');
+    doc.innerHTML = `<div class="doc-h1">${cs.docTitle}</div>${blocks}`;
+  }
+
+  function chipHtml(key, n, subLabel) {
+    const cs = convState[key];
+    return `
+      <div class="artifact-chip" onclick="openArtifact()">
+        <div class="artifact-icon">${cs.docTitle.charAt(0)}</div>
+        <div class="artifact-chip-text">
+          <div class="artifact-chip-title">${cs.docTitle}</div>
+          <div class="artifact-chip-sub">Document · v${n}${subLabel ? ' · ' + subLabel : ''}</div>
+        </div>
+        <button class="chip-download-btn" onclick="event.stopPropagation(); downloadVersion(${n}, '${key}')" aria-label="Download version ${n}">⬇</button>
+      </div>`;
+  }
+
+  function renderInitialChat(key) {
+    const script = CHAT_SCRIPTS[key];
+    document.getElementById('messages-' + key).innerHTML = `
+      <div class="msg user"><div class="msg-role">You</div><div class="msg-body">${script.userMsg1}</div></div>
+      <div class="msg assistant"><div class="msg-role">Claude</div><div class="msg-body"><p>${script.claudeMsg1}</p>${chipHtml(key, 1)}</div></div>
+      <div class="msg user"><div class="msg-role">You</div><div class="msg-body">${script.userMsg2}</div></div>
+      <div class="msg assistant"><div class="msg-role">Claude</div><div class="msg-body"><p>${script.claudeMsg2}</p>${chipHtml(key, 2)}</div></div>
+    `;
+  }
+
+  ['hiring', 'pricing', 'feedback'].forEach(k => {
+    renderInitialChat(k);
+    renderSimpleDoc(k, 2);
+  });
+
+  // ---------------------------------------------------------------
+  // Switching conversations
+  // ---------------------------------------------------------------
+  function switchConversation(key) {
+    activeConv = key;
+
+    document.querySelectorAll('.side-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('side-' + key).classList.add('active');
+
+    document.querySelectorAll('.messages').forEach(el => el.style.display = 'none');
+    document.getElementById('messages-' + key).style.display = 'block';
+
+    document.querySelectorAll('.artifact-doc').forEach(el => el.style.display = 'none');
+    document.getElementById('doc-' + key).style.display = 'block';
+
+    const cs = convState[key];
+    document.getElementById('chatTitleText').textContent = cs.chatTitle;
+    document.getElementById('artifactHeaderTitle').textContent = cs.docTitle;
+    document.getElementById('versionLabel').textContent = `Version ${cs.currentVersion} of ${cs.versionCounter}`;
+
+    const compareToggleBtn = document.getElementById('compareToggle');
+    const staticNote = document.getElementById('staticNote');
+    const footer = document.getElementById('artifactFooter');
+    const resetLink = document.getElementById('resetLink');
+
+    if (cs.interactive) {
+      compareToggleBtn.style.display = '';
+      staticNote.style.display = 'none';
+      footer.style.display = 'flex';
+      resetLink.style.display = 'inline';
+      restoreMemoCompareView();
+    } else {
+      compareToggleBtn.style.display = 'none';
+      document.getElementById('compareBanner').classList.remove('show');
+      staticNote.style.display = 'block';
+      staticNote.textContent = `This document has ${cs.versionCounter} version${cs.versionCounter > 1 ? 's' : ''} in history. Nothing is waiting for review, but every version is real: preview it, revert to it, or save it.`;
+      footer.style.display = 'none';
+      resetLink.style.display = 'none';
+    }
+
+    renderHistoryList();
+    closeHistory();
+    closeDrawer();
+    document.getElementById('chatScroll').scrollTop = 0;
+  }
+
+  function restoreMemoCompareView() {
+    const banner = document.getElementById('compareBanner');
+    const btn = document.getElementById('compareToggle');
+    const anyUndecided = Object.values(decisions).some(d => d === null);
+    const sections = document.getElementById('doc-memo').querySelectorAll('.doc-section.changed');
+
+    if (anyUndecided && !memoFinalized) {
+      banner.classList.add('show');
+      btn.classList.add('active');
+      document.getElementById('pendingBadge').style.display = '';
+      sections.forEach(s => {
+        s.querySelectorAll('.del-text').forEach(el => el.style.display = 'inline');
+        const id = s.id.replace('section-', '');
+        if (!decisions[id]) s.querySelectorAll('.section-actions').forEach(el => el.classList.add('show'));
+      });
+    } else {
+      banner.classList.remove('show');
+      btn.classList.remove('active');
+    }
+    updateFooter();
+  }
+
+  // ---------------------------------------------------------------
+  // Version text, download / share
+  // ---------------------------------------------------------------
+  function buildVersionText(n, key) {
+    key = key || activeConv;
+    if (key === 'memo') {
+      const v = convState.memo.versionRegistry[n];
+      const introText = v.intro === 'old' ? TEXT.introOld : TEXT.introNew;
+      const recText = v.rec === 'old' ? TEXT.recOld : TEXT.recNew;
+      let text = `${TEXT.heading}\n${'='.repeat(TEXT.heading.length)}\n\n`;
+      text += `Overview\n--------\n${introText}\n\n`;
+      text += `Current State\n-------------\n${TEXT.currentState}\n\n`;
+      text += `Recommendation\n--------------\n${recText}\n\n`;
+      text += `Next Steps\n----------\n${TEXT.nextSteps}\n`;
+      text += `\n---\nExported from Claude · Version ${n}\n`;
+      return text;
+    }
+    const cs = convState[key];
+    return `${cs.docTitle}\n${'='.repeat(cs.docTitle.length)}\n\n${cs.versionRegistry[n]}\n\n---\nExported from Claude · Version ${n}\n`;
+  }
+
+  // On phones that support it, this opens the native share sheet (Save to Files, AirDrop, other apps).
+  // Everywhere else it falls back to a normal file download.
+  async function downloadVersion(n, key) {
+    key = key || activeConv;
+    const text = buildVersionText(n, key);
+    const filename = `${convState[key].docTitle} - Version ${n}.txt`;
+
+    try {
+      if (typeof File === 'function' && navigator.canShare) {
+        const file = new File([text], filename, { type: 'text/plain' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: filename });
+          showToast(`Shared ${filename}`);
+          return;
+        }
+      }
+    } catch (e) {
+      if (e && e.name === 'AbortError') return; // user closed the share sheet
+    }
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`Saved ${filename}`);
+  }
+
+  function downloadCurrentVersion() {
+    return downloadVersion(convState[activeConv].currentVersion, activeConv);
+  }
+
+  function appendChatArtifactMessage(n, introLine, subLabel, key) {
+    key = key || activeConv;
+    const messages = document.getElementById('messages-' + key);
+    const msg = document.createElement('div');
+    msg.className = 'msg assistant';
+    msg.innerHTML = `<div class="msg-role">Claude</div><div class="msg-body"><p>${introLine}</p>${chipHtml(key, n, subLabel)}</div>`;
+    messages.appendChild(msg);
+    if (key === activeConv) {
+      const scroll = document.getElementById('chatScroll');
+      scroll.scrollTop = scroll.scrollHeight;
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Version history (bottom sheet)
+  // ---------------------------------------------------------------
+  function renderHistoryList() {
+    const cs = convState[activeConv];
+    const list = document.getElementById('historyList');
+    list.innerHTML = '';
+    [...cs.versionHistory].sort((a, b) => b.num - a.num).forEach(v => {
+      const isCurrent = v.num === cs.currentVersion;
+      const div = document.createElement('div');
+      div.className = 'history-item' + (isCurrent ? ' current' : '');
+      div.innerHTML = `
+        <div class="history-item-top">
+          <div class="history-item-title">Version ${v.num}${isCurrent ? ' · Current' : ''}</div>
+          ${isCurrent ? '<div class="history-item-tag">NOW</div>' : ''}
+        </div>
+        <div class="history-item-sub">${v.desc}</div>
+        ${!isCurrent ? `<div class="history-item-actions">
+          <button class="hist-btn" onclick="previewVersion(${v.num})">Preview</button>
+          <button class="hist-btn" onclick="revertTo(${v.num})">Revert to this</button>
+        </div>` : ''}
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  function previewVersion(n) {
+    showToast('Previewing Version ' + n + ' (read-only)');
+  }
+
+  // ---------------------------------------------------------------
+  // Memo only: the live review (diff, keep new / keep old)
+  // ---------------------------------------------------------------
+  function toggleCompare() {
+    const banner = document.getElementById('compareBanner');
+    const btn = document.getElementById('compareToggle');
+    const sections = document.querySelectorAll('#doc-memo .doc-section.changed');
+    const showing = banner.classList.contains('show');
+
+    if (showing) {
+      banner.classList.remove('show');
+      btn.classList.remove('active');
+      sections.forEach(s => {
+        s.querySelectorAll('.del-text').forEach(el => el.style.display = 'none');
+        s.querySelectorAll('.section-actions').forEach(el => el.classList.remove('show'));
+      });
+    } else {
+      banner.classList.add('show');
+      btn.classList.add('active');
+      sections.forEach(s => {
+        s.querySelectorAll('.del-text').forEach(el => el.style.display = 'inline');
+        if (!decisions[s.id.replace('section-', '')]) {
+          s.querySelectorAll('.section-actions').forEach(el => el.classList.add('show'));
+        }
+      });
+    }
+  }
+
+  function decideSection(id, choice, btnEl) {
+    decisions[id] = choice;
+    const section = document.getElementById('section-' + id);
+    const tag = document.getElementById('tag-' + id);
+    section.querySelectorAll('.sec-btn').forEach(b => b.classList.remove('picked'));
+    btnEl.classList.add('picked');
+
+    section.classList.remove('decided-accept', 'decided-reject');
+    tag.classList.remove('show', 'accepted', 'rejected');
+
+    const rescope = document.getElementById('rescope-' + id);
+    if (choice === 'new') {
+      section.classList.add('decided-accept');
+      tag.textContent = 'Keeping new version';
+      tag.classList.add('show', 'accepted');
+      if (rescope) rescope.classList.remove('show');
+    } else {
+      section.classList.add('decided-reject');
+      tag.textContent = 'Reverted to prior version';
+      tag.classList.add('show', 'rejected');
+      if (rescope) rescope.classList.add('show');
+    }
+    updateFooter();
+  }
+
+  function updateFooter() {
+    const confirmBtn = document.getElementById('confirmBtn');
+    const footerNote = document.getElementById('footerNote');
+
+    if (memoFinalized) {
+      footerNote.textContent = 'Finalized, nothing pending';
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Confirmed';
+      document.getElementById('pendingBadge').style.display = 'none';
+      return;
+    }
+
+    const decided = Object.values(decisions).filter(d => d !== null).length;
+    pendingCount = 2 - decided;
+    document.getElementById('pendingBadge').style.display = '';
+    document.getElementById('pendingBadge').textContent = pendingCount;
+
+    if (pendingCount === 0) {
+      footerNote.textContent = 'All sections reviewed';
+      confirmBtn.disabled = false;
+    } else {
+      footerNote.textContent = pendingCount + ' section' + (pendingCount > 1 ? 's' : '') + ' awaiting your decision';
+      confirmBtn.disabled = true;
+    }
+    confirmBtn.textContent = 'Confirm changes';
+  }
+
+  function acceptAllChanges() {
+    document.querySelectorAll('#doc-memo .doc-section.changed').forEach(s => {
+      const id = s.id.replace('section-', '');
+      const btn = s.querySelector('.sec-btn.keep-new');
+      if (btn && !decisions[id]) decideSection(id, 'new', btn);
+    });
+    showToast('All changes accepted');
+  }
+
+  function rejectAllChanges() {
+    document.querySelectorAll('#doc-memo .doc-section.changed').forEach(s => {
+      const id = s.id.replace('section-', '');
+      const btn = s.querySelector('.sec-btn.keep-old');
+      if (btn && !decisions[id]) decideSection(id, 'old', btn);
+    });
+    showToast('All changes reverted to prior version');
+  }
+
+  function confirmChanges() {
+    const accepted = Object.values(decisions).filter(d => d === 'new').length;
+    const rejected = Object.values(decisions).filter(d => d === 'old').length;
+    const cs = convState.memo;
+
+    document.querySelectorAll('#doc-memo .doc-section.changed').forEach(s => {
+      const id = s.id.replace('section-', '');
+      const decision = decisions[id];
+
+      s.querySelectorAll('.del-text').forEach(el => {
+        if (decision === 'old') {
+          el.classList.remove('del-text');
+          el.style.textDecoration = 'none';
+          el.style.color = 'inherit';
+          el.style.background = 'none';
+        } else {
+          el.remove();
+        }
+      });
+      s.querySelectorAll('.add-text').forEach(el => {
+        if (decision === 'new') {
+          el.classList.remove('add-text');
+          el.style.color = 'inherit';
+          el.style.background = 'none';
+          el.style.fontWeight = 'normal';
+        } else {
+          el.remove();
+        }
+      });
+
+      s.classList.remove('changed', 'decided-accept', 'decided-reject');
+      s.classList.add('unchanged');
+      s.querySelector('.doc-section-label')?.remove();
+      s.querySelector('.section-actions')?.remove();
+      s.querySelector('.decision-tag')?.remove();
+      s.querySelector('.rescope-box')?.remove();
+    });
+
+    document.getElementById('compareBanner').classList.remove('show');
+    document.getElementById('compareToggle').classList.remove('active');
+
+    cs.versionCounter++;
+    const newNum = cs.versionCounter;
+    cs.versionRegistry[newNum] = { intro: decisions.intro, rec: decisions.rec };
+    cs.versionHistory.unshift({
+      num: newNum,
+      desc: `${accepted} section(s) updated, ${rejected} reverted to prior wording. Finalized from your review of Version ${cs.currentVersion}.`,
+    });
+    cs.currentVersion = newNum;
+    renderHistoryList();
+
+    document.getElementById('versionLabel').textContent = `Version ${newNum} of ${newNum}`;
+    memoFinalized = true;
+    updateFooter();
+
+    flashVersionBanner(`✓ Version ${newNum} created. Every earlier version is still saved in History.`);
+    appendChatArtifactMessage(
+      newNum,
+      `Version ${newNum} saved: ${accepted} section(s) updated, ${rejected} reverted to the prior wording.`,
+      `${accepted + rejected} section(s) reviewed`,
+      'memo'
+    );
+    showToast(`Version ${newNum} saved and posted in the chat`);
+  }
+
+  function applyVersionToDocument(n) {
+    const v = convState.memo.versionRegistry[n];
+    [ ['section-intro', v.intro === 'old' ? TEXT.introOld : TEXT.introNew],
+      ['section-rec', v.rec === 'old' ? TEXT.recOld : TEXT.recNew] ].forEach(([id, text]) => {
+      const section = document.getElementById(id);
+      if (!section) return;
+      const p = section.querySelector('p');
+      if (p) p.textContent = text;
+      section.classList.remove('changed', 'decided-accept', 'decided-reject');
+      section.classList.add('unchanged');
+      section.querySelector('.doc-section-label')?.remove();
+      section.querySelector('.section-actions')?.remove();
+      section.querySelector('.decision-tag')?.remove();
+      section.querySelector('.rescope-box')?.remove();
+    });
+
+    decisions = { intro: null, rec: null };
+    memoFinalized = true;
+    document.getElementById('compareBanner').classList.remove('show');
+    document.getElementById('compareToggle').classList.remove('active');
+    updateFooter();
+  }
+
+  // ---------------------------------------------------------------
+  // Revert (works for every conversation). Revert adds a new version; nothing is deleted.
+  // ---------------------------------------------------------------
+  function revertTo(n) {
+    const key = activeConv;
+    const cs = convState[key];
+    cs.versionCounter++;
+    const newNum = cs.versionCounter;
+
+    cs.versionRegistry[newNum] = (key === 'memo') ? { ...cs.versionRegistry[n] } : cs.versionRegistry[n];
+    cs.versionHistory.unshift({
+      num: newNum,
+      desc: `Reverted to Version ${n}. Content restored to that point; kept as a new version so nothing in between is lost.`,
+    });
+    cs.currentVersion = newNum;
+    renderHistoryList();
+
+    if (key === 'memo') applyVersionToDocument(newNum);
+    else renderSimpleDoc(key, newNum);
+
+    document.getElementById('versionLabel').textContent = `Version ${newNum} of ${newNum} (restored from v${n})`;
+    closeHistory();
+    flashVersionBanner(`↺ Version ${newNum} created, restored from Version ${n}. Every version is still in History.`);
+
+    appendChatArtifactMessage(
+      newNum,
+      `Reverted to Version ${n}. This is now Version ${newNum}, the current version.`,
+      `restored from v${n}`,
+      key
+    );
+  }
+
+  // ---------------------------------------------------------------
+  // Reset (memo only): lets someone run the whole review again
+  // ---------------------------------------------------------------
+  function resetDemo() {
+    if (activeConv !== 'memo') return;
+
+    document.getElementById('doc-memo').innerHTML = ORIGINAL_DOC_MEMO_HTML;
+    document.getElementById('messages-memo').innerHTML = ORIGINAL_MESSAGES_MEMO_HTML;
+
+    decisions = { intro: null, rec: null };
+    memoFinalized = false;
+
+    const cs = convState.memo;
+    cs.versionCounter = 2;
+    cs.currentVersion = 2;
+    cs.versionHistory.length = 0;
+    cs.versionHistory.push(
+      { num: 2, desc: "Tightened recommendation, softened intro tone. 2 sections changed from v1." },
+      { num: 1, desc: "Original draft. Intro, recommendation, next steps." }
+    );
+    Object.keys(cs.versionRegistry).forEach(k => delete cs.versionRegistry[k]);
+    cs.versionRegistry[1] = { intro: 'old', rec: 'old' };
+    cs.versionRegistry[2] = { intro: 'new', rec: 'new' };
+
+    document.getElementById('versionLabel').textContent = 'Version 2 of 2';
+    restoreMemoCompareView();
+    renderHistoryList();
+    showToast('Demo reset. Review the changes again from Version 2.');
+  }
+
+  switchConversation('memo');
+</script>
+
+</body>
+</html>

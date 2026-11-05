@@ -89,20 +89,22 @@ export const MetricBox: React.FC<MetricBoxProps> = ({
   // Size styling
   const numSizeClass =
     size === 'large'
-      ? 'text-3xl sm:text-4xl'
+      ? 'text-2xl sm:text-4xl'
       : size === 'compact'
-      ? 'text-lg sm:text-xl'
-      : 'text-2xl sm:text-3xl';
+      ? 'text-base sm:text-lg'
+      : 'text-xl sm:text-2xl';
 
   const labelSizeClass =
     size === 'compact'
-      ? 'text-xs text-[#86868B] dark:text-[#8E8E93]'
-      : 'text-xs sm:text-[13px] text-[#6E6E73] dark:text-[#A1A1A8]';
+      ? 'text-[11px] sm:text-xs text-[#6E6E73] dark:text-[#A1A1A8] leading-tight break-words'
+      : 'text-xs sm:text-[13px] text-[#6E6E73] dark:text-[#A1A1A8] leading-snug break-words';
 
   return (
     <div
       ref={boxRef}
-      className={`rounded-2xl p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 ${
+      className={`rounded-2xl ${
+        size === 'compact' ? 'p-3 sm:p-4' : 'p-4 sm:p-5'
+      } flex flex-col justify-between transition-all duration-300 ${
         dark
           ? 'bg-[#242426] border border-[#3A3A3D] text-white hover:border-[#555]'
           : 'bg-gradient-to-br from-white to-[#F8F8FB] dark:from-[#18181C] dark:to-[#141416] border border-[#E2E2E8] dark:border-[#2C2C32] text-[#1D1D1F] dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md hover:border-[#D0D0D8] dark:hover:border-[#44444C]'

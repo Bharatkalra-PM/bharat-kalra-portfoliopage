@@ -33,9 +33,9 @@ export const Navbar: React.FC = () => {
   };
 
   const navLinks = [
-    { label: 'About', href: isHome ? '#about' : '/#about' },
     { label: 'Work', href: isHome ? '#work' : '/#work' },
     { label: 'Experience', href: isHome ? '#experience' : '/#experience' },
+    { label: 'About', href: isHome ? '#about' : '/#about' },
     { label: 'Learning', href: isHome ? '#learning' : '/#learning' },
     { label: 'Beyond work', href: isHome ? '#beyond-work' : '/#beyond-work' },
     { label: 'Contact', href: isHome ? '#contact' : '/#contact' },

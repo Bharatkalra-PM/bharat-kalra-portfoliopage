@@ -9,7 +9,6 @@ interface CaseStudyCardProps {
 }
 
 export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy }) => {
-  const isFlagship = caseStudy.isFlagship;
 
   // Render creative designed covers for case studies without static thumbnail
   const renderCreativeCover = () => {
@@ -141,19 +140,13 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy }) => {
 
   return (
     <div
-      className={`group bg-white dark:bg-[#161619] rounded-[26px] border border-[#E2E2E8] dark:border-[#27272A] shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1.5 ${
-        isFlagship ? 'md:col-span-2 lg:col-span-2 ring-1 ring-black/5 dark:ring-white/10' : ''
-      }`}
+      className="group bg-white dark:bg-[#161619] rounded-[26px] border border-[#E2E2E8] dark:border-[#27272A] shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:-translate-y-1.5"
     >
       <div>
         {/* Cover image or designed cover */}
         <Link to={`/work/${caseStudy.slug}`} className="block relative overflow-hidden bg-slate-950">
           {caseStudy.thumbnail ? (
-            <div
-              className={`relative w-full overflow-hidden ${
-                isFlagship ? 'h-72 sm:h-80 md:h-[380px]' : 'h-60 sm:h-64'
-              }`}
-            >
+            <div className="relative w-full overflow-hidden h-60 sm:h-64">
               {/* Product image in full color without grayscale */}
               <img
                 src={caseStudy.thumbnail}
@@ -164,14 +157,6 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy }) => {
 
               {/* Sophisticated gradient overlay for readability & luxury finish */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
-
-              {/* Flagship Badge */}
-              {isFlagship && (
-                <div className="absolute top-5 left-5 z-10 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-[#18181C]/95 text-slate-900 dark:text-white shadow-lg backdrop-blur-md text-xs font-semibold border border-white/20">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                  <span>Flagship 2026 Product</span>
-                </div>
-              )}
 
               {/* Status Pill on thumbnail */}
               <div className="absolute bottom-4 left-5 right-5 z-10 flex items-center justify-between text-white text-xs">

@@ -49,16 +49,16 @@ export const ExperienceTimeline: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Metric Board if metrics present */}
+                {/* Metric Board if metrics present - Strictly ONE single line */}
                 {role.metrics && role.metrics.length > 0 && (
-                  <div className="my-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+                  <div className="my-4 grid grid-flow-col auto-cols-fr gap-2.5 overflow-x-auto scrollbar-none py-1">
                     {role.metrics.map((m, mIdx) => (
                       <MetricBox
                         key={mIdx}
                         value={m.value}
                         label={m.label}
                         size="compact"
-                        className="bg-[#F5F5F7] dark:bg-[#202024]"
+                        className="bg-[#F5F5F7] dark:bg-[#202024] min-w-[110px]"
                       />
                     ))}
                   </div>

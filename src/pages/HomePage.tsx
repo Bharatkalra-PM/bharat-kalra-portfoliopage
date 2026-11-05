@@ -126,12 +126,8 @@ export const HomePage: React.FC = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
                 <span>Product Principle</span>
               </div>
-              <p className="text-xs sm:text-sm font-medium text-[#1D1D1F] dark:text-white leading-snug">
-                "You don't build{' '}
-                <span className="font-serif italic underline decoration-slate-300 dark:decoration-slate-600 underline-offset-2">
-                  what your users ask for
-                </span>
-                . You build for the problems they face."
+              <p className="text-xs sm:text-sm text-[#1D1D1F] dark:text-white leading-snug">
+                "You don't build <strong className="font-semibold text-[#1D1D1F] dark:text-white">what your users ask for</strong>. You build for the problems they face."
               </p>
             </div>
 
@@ -252,50 +248,69 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. ABOUT SECTION: Streamlined & Human */}
+      {/* 4. ABOUT SECTION: Fully Symmetrical 2-Column Grid (Zero Empty Space on Right) */}
       <section id="about" className="py-10 md:py-14 bg-white dark:bg-[#0C0C0E] border-b border-[#E8E8ED] dark:border-[#27272A] transition-colors">
         <div className="max-w-[1100px] mx-auto px-6 md:px-8">
-          <div className="max-w-3xl">
-            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-2">
+          <div className="mb-6">
+            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-1">
               Background & Focus
             </span>
-
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1D1D1F] dark:text-white mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1D1D1F] dark:text-white">
               {about.heading}
             </h2>
-
-            <p className="text-base sm:text-lg font-normal text-[#6E6E73] dark:text-[#A1A1A8] leading-snug mb-5">
+            <p className="text-base sm:text-lg font-normal text-[#6E6E73] dark:text-[#A1A1A8] leading-snug mt-1">
               {about.leadLine}
             </p>
+          </div>
 
-            {/* Concise narrative */}
-            <div className="space-y-3.5 text-sm sm:text-base text-[#1D1D1F] dark:text-[#D1D1D6] leading-relaxed">
-              <p>
-                Over 8+ years, I have built and scaled digital products across B2B and B2C. The roles that shaped me most were at{' '}
-                <strong className="text-black dark:text-white font-semibold">Axis Max Life</strong>, owning partner bank journeys and the SME business insurance ecosystem end to end (generating expected additional revenue of ₹30 Cr), and{' '}
-                <strong className="text-black dark:text-white font-semibold">Tata AIA</strong>, leading a ground-up D2C revamp on the Adobe stack (AEM, Analytics, Target) that doubled month-on-month traffic.
-              </p>
-              <p>
-                My goal is to build products that solve real friction rather than copy what already exists. Looking back, one consistent theme runs through my work: people change more easily when they have the right people beside them.
-              </p>
+          {/* Symmetrical 2-Column Grid spanning the full container width */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left Card: Core Philosophy & Track Record */}
+            <div className="bg-[#F7F7FA] dark:bg-[#18181C] rounded-[24px] border border-[#E2E2E8] dark:border-[#2C2C32] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
+              <div>
+                <span className="text-xs font-semibold tracking-wider text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-3">
+                  Philosophy & Conviction
+                </span>
+                <div className="space-y-3.5 text-sm sm:text-base text-[#1D1D1F] dark:text-[#D1D1D6] leading-relaxed">
+                  <p>
+                    I believe living in the grey keeps you open, able to hold more than one perspective at once. But it is the binary calls, the clear yes or no, that actually move things forward.
+                  </p>
+                  <p>
+                    Over 8+ years, I have built and scaled digital products across B2B and B2C. The roles that shaped me most were at <strong className="text-black dark:text-white font-semibold">Axis Max Life</strong>, owning partner bank journeys and the SME business insurance ecosystem end to end (generating expected additional revenue of ₹30 Cr), and <strong className="text-black dark:text-white font-semibold">Tata AIA</strong>, leading a ground-up D2C revamp on the Adobe stack (AEM, Analytics, Target) that doubled month-on-month traffic.
+                  </p>
+                  <p>
+                    My goal is to build products that solve real friction rather than copy what already exists. Looking back, one consistent theme runs through my work: people change more easily when they have the right people beside them.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 mt-5 border-t border-[#E8E8ED] dark:border-[#26262B] text-xs text-[#86868B] dark:text-[#A1A1A8] italic">
+                {about.fiveYearsLine}
+              </div>
             </div>
 
-            {/* Currently Card */}
-            <div className="bg-[#F7F7FA] dark:bg-[#18181C] rounded-2xl border border-[#E4E4EC] dark:border-[#2C2C32] p-4 sm:p-5 my-6">
-              <div className="flex items-center gap-2 mb-2.5">
-                <span className="w-2 h-2 rounded-full bg-blue-600" />
-                <span className="text-xs font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase">
-                  Currently
-                </span>
+            {/* Right Card: Currently & Active Research */}
+            <div className="bg-[#F7F7FA] dark:bg-[#18181C] rounded-[24px] border border-[#E2E2E8] dark:border-[#2C2C32] p-6 sm:p-7 flex flex-col justify-between shadow-xs">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
+                  <span className="text-xs font-semibold tracking-wider text-[#86868B] dark:text-[#A1A1A8] uppercase">
+                    Currently & Focus Areas
+                  </span>
+                </div>
+                <ul className="space-y-3.5">
+                  {about.currently.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-sm text-[#1D1D1F] dark:text-[#D1D1D6] leading-relaxed">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5 select-none" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="space-y-2">
-                {about.currently.slice(0, 3).map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-[#1D1D1F] dark:text-[#D1D1D6]">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5 select-none" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+
+              <div className="pt-4 mt-5 border-t border-[#E8E8ED] dark:border-[#26262B] p-3.5 rounded-xl bg-white dark:bg-[#121215] border border-[#E8E8ED] dark:border-[#27272A] text-xs text-[#6E6E73] dark:text-[#A1A1A8] leading-relaxed">
+                <strong className="text-[#1D1D1F] dark:text-white font-semibold">Core Focus: </strong>
+                Generative & Agentic AI systems, discovery-to-delivery execution, and behavioural customer journeys.
+              </div>
             </div>
           </div>
         </div>

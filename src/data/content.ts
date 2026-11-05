@@ -137,7 +137,7 @@ export const caseStudies: CaseStudy[] = [
     title: "People Like Me",
     hook: "Don't switch careers alone. A live product matching career switchers with a guide who made the same move, and a small pod making it with them.",
     meta: "2026 · 1 week · Discovery, delivery and distribution",
-    isFlagship: true,
+    isFlagship: false,
     chips: [
       "12 of 13 couldn't find people like them",
       "4 user tests",

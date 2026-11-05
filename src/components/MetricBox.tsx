@@ -125,7 +125,7 @@ export const MetricBox: React.FC<MetricBoxProps> = ({
             ))}
           </div>
         ) : (
-          <span className={`font-bold tracking-tight text-[#1D1D1F] dark:text-white tabular-nums ${numSizeClass}`}>
+          <span className={`font-bold tracking-tight text-[#1D1D1F] dark:text-white tabular-nums whitespace-nowrap ${numSizeClass}`}>
             {animatedValue}
           </span>
         )}

@@ -46,22 +46,37 @@ export const HomePage: React.FC = () => {
       <section id="hero" className="relative pt-6 pb-8 md:pt-10 md:pb-10 border-b border-[#E8E8ED] dark:border-[#27272A] bg-gradient-to-b from-[#FAFAFC] via-white to-white dark:from-[#0E0E12] dark:via-[#0C0C0E] dark:to-[#0C0C0E] transition-colors">
         <div className="max-w-[1100px] mx-auto px-6 md:px-8">
           {/* Header Row: DP + Name/Title + Actions */}
-          <div className="flex flex-col sm:flex-row items-start gap-5 sm:gap-6">
-            {/* DP / Profile Photo - Clean, subtle squircle */}
-            <div className="shrink-0">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-white dark:bg-[#18181C] border border-[#E2E2E8] dark:border-[#2E2E34] shadow-sm">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+            {/* Mobile Header: Photo + Name/Title side-by-side */}
+            <div className="flex items-center sm:items-start gap-4 sm:gap-6 w-full sm:w-auto">
+              {/* DP / Profile Photo - Clean, subtle squircle */}
+              <div className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-white dark:bg-[#18181C] border border-[#E2E2E8] dark:border-[#2E2E34] shadow-sm">
                 <img
                   src={hero.photo}
                   alt="Bharat Kalra portrait"
                   className="w-full h-full object-cover"
                 />
               </div>
+
+              {/* Mobile-only parallel Name + Title (fills the blank space to the right of photo) */}
+              <div className="sm:hidden flex-1 min-w-0">
+                <h1 className="text-xl font-bold tracking-tight text-[#1D1D1F] dark:text-white leading-tight">
+                  {hero.name}
+                </h1>
+                <p className="text-xs font-semibold text-[#6E6E73] dark:text-[#A1A1A8] mt-1 leading-snug">
+                  {hero.title}
+                </p>
+                <div className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400 mt-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                  <span>Open to roles</span>
+                </div>
+              </div>
             </div>
 
-            {/* Name, Title, and Location */}
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2.5 mb-1.5">
-                {/* Bharat Kalra font made refined and tasteful */}
+            {/* Content block */}
+            <div className="flex-1 min-w-0 w-full">
+              {/* Desktop Name & Title */}
+              <div className="hidden sm:flex flex-wrap items-center gap-2.5 mb-1.5">
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1D1D1F] dark:text-white">
                   {hero.name}
                 </h1>
@@ -71,14 +86,19 @@ export const HomePage: React.FC = () => {
                 </span>
               </div>
 
-              {/* Status pill: Location & Availability */}
-              <div className="inline-flex items-center gap-2 text-xs font-medium text-[#48484A] dark:text-[#C4C4CC] bg-[#F5F5F8] dark:bg-[#18181C] border border-[#E2E2E8] dark:border-[#2E2E34] px-3 py-1 rounded-full mb-3">
+              {/* Status pill: Location & Availability (Desktop) */}
+              <div className="hidden sm:inline-flex items-center gap-2 text-xs font-medium text-[#48484A] dark:text-[#C4C4CC] bg-[#F5F5F8] dark:bg-[#18181C] border border-[#E2E2E8] dark:border-[#2E2E34] px-3 py-1 rounded-full mb-3">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 <span>Open to roles · Mumbai, Pune, Bengaluru, Remote or Outside India</span>
               </div>
 
+              {/* Mobile Location Sub-bar */}
+              <div className="sm:hidden text-[11px] text-[#6E6E73] dark:text-[#9A9AA2] mb-3">
+                Mumbai, Pune, Bengaluru, Remote or Outside India
+              </div>
+
               {/* Subline */}
-              <p className="text-sm text-[#55555A] dark:text-[#A8A8B2] leading-relaxed max-w-2xl mb-4">
+              <p className="text-sm text-[#55555A] dark:text-[#A8A8B2] leading-relaxed max-w-2xl mb-4 text-justify sm:text-left">
                 {hero.subline}
               </p>
 
@@ -479,7 +499,7 @@ export const HomePage: React.FC = () => {
             </p>
 
             {/* Direct Contact methods: Email & Phone */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-5">
+            <div className="flex flex-col sm:flex-row gap-3">
               <a
                 href={`mailto:${contact.email}`}
                 className="inline-flex items-center gap-2.5 p-3.5 rounded-xl bg-white dark:bg-[#18181C] hover:bg-[#F2F2F5] dark:hover:bg-[#202024] border border-[#E2E2E8] dark:border-[#2C2C32] text-xs sm:text-sm font-semibold text-[#1D1D1F] dark:text-white transition-colors shadow-xs"
@@ -495,28 +515,6 @@ export const HomePage: React.FC = () => {
                 <Phone className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>{contact.phoneDisplay}</span>
               </a>
-            </div>
-
-            {/* Social Links: LinkedIn, GitHub, Substack */}
-            <div className="flex items-center gap-2.5 flex-wrap">
-              {contact.links.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-xs font-semibold text-[#1D1D1F] dark:text-white bg-white dark:bg-[#18181C] hover:bg-[#F2F2F5] dark:hover:bg-[#222226] border border-[#D8D8DF] dark:border-[#2C2C32] px-3.5 py-2 rounded-xl shadow-xs transition-colors"
-                >
-                  {link.label === 'LinkedIn' ? (
-                    <svg className="w-3.5 h-3.5 fill-[#0A66C2] shrink-0" viewBox="0 0 24 24">
-                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
-                    </svg>
-                  ) : (
-                    <ExternalLink className="w-3.5 h-3.5 text-[#86868B] dark:text-[#A1A1A8] shrink-0" />
-                  )}
-                  <span>{link.label}</span>
-                </a>
-              ))}
             </div>
           </div>
         </div>

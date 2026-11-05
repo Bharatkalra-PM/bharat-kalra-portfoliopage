@@ -55,12 +55,12 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy }) => {
             </div>
           </div>
 
-          {/* Key Stat Footnote - 100% visible on mobile, never omitted */}
-          <div className="relative z-10 flex items-baseline justify-between pt-2 border-t border-stone-800/80">
-            <span className="text-xl sm:text-2xl font-bold tracking-tight text-white font-mono">
+          {/* Key Stat Footnote - strictly on the same line */}
+          <div className="relative z-10 pt-2 border-t border-stone-800/80 flex items-center gap-2 flex-nowrap text-xs">
+            <span className="font-mono font-bold text-white whitespace-nowrap text-sm sm:text-base shrink-0">
               18 of 26
             </span>
-            <span className="text-[11px] sm:text-xs text-stone-400 font-normal ml-2 text-right">
+            <span className="text-[11px] sm:text-xs text-stone-400 truncate">
               users re-prompt instead of partially accepting
             </span>
           </div>
@@ -109,12 +109,12 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy }) => {
             </div>
           </div>
 
-          {/* Key Stat Footnote - 100% visible on mobile, never omitted */}
-          <div className="relative z-10 flex items-baseline justify-between pt-2 border-t border-slate-800">
-            <span className="text-xl sm:text-2xl font-bold tracking-tight text-amber-400 font-mono">
+          {/* Key Stat Footnote - strictly on the same line */}
+          <div className="relative z-10 pt-2 border-t border-slate-800 flex items-center gap-2 flex-nowrap text-xs">
+            <span className="font-mono font-bold text-amber-400 whitespace-nowrap text-sm sm:text-base shrink-0">
               90%
             </span>
-            <span className="text-[11px] sm:text-xs text-slate-300 font-normal ml-2 text-right">
+            <span className="text-[11px] sm:text-xs text-slate-300 truncate">
               stuck at trust stage abandoned or switched
             </span>
           </div>

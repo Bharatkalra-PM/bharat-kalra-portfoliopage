@@ -43,7 +43,7 @@ export const CaseStudyDetail: React.FC = () => {
             <span>Solo project</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-[#1D1D1F] dark:text-white leading-[1.15] mb-5">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white leading-[1.15] mb-5">
             {caseStudy.title}
           </h1>
 
@@ -165,9 +165,6 @@ export const CaseStudyDetail: React.FC = () => {
         {/* 2. Metric board */}
         {caseStudy.metrics && caseStudy.metrics.length > 0 && (
           <section className="mb-16">
-            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] uppercase block mb-4">
-              Metric Board
-            </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
               {caseStudy.metrics.map((m, idx) => (
                 <MetricBox
@@ -184,9 +181,9 @@ export const CaseStudyDetail: React.FC = () => {
         {/* 3. The problem */}
         {caseStudy.problem && (
           <section className="mb-14 pb-14 border-b border-[#E8E8ED] dark:border-[#27272A]">
-            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-3">
+            <h2 className="text-2xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white mb-3">
               The problem
-            </span>
+            </h2>
             <div className="p-7 sm:p-8 rounded-[22px] bg-[#F5F5F7] dark:bg-[#18181C] border border-[#E8E8ED] dark:border-[#2C2C32]">
               <p className="text-base sm:text-lg text-[#1D1D1F] dark:text-[#D1D1D6] leading-relaxed">
                 {caseStudy.problem}
@@ -198,9 +195,9 @@ export const CaseStudyDetail: React.FC = () => {
         {/* 4. What I did (timeline / process) */}
         {caseStudy.timeline && caseStudy.timeline.length > 0 && (
           <section className="mb-14 pb-14 border-b border-[#E8E8ED] dark:border-[#27272A]">
-            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-6">
+            <h2 className="text-2xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white mb-6">
               What I did (process timeline)
-            </span>
+            </h2>
             <div className="flex flex-col space-y-3">
               {caseStudy.timeline.map((step, idx) => (
                 <div key={idx} className="flex items-start gap-3">
@@ -219,9 +216,9 @@ export const CaseStudyDetail: React.FC = () => {
         {/* Why RAG (Agent Copilot specific) */}
         {caseStudy.whyRag && (
           <section className="mb-14 pb-14 border-b border-[#E8E8ED] dark:border-[#27272A]">
-            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-3">
+            <h2 className="text-2xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white mb-3">
               Why RAG
-            </span>
+            </h2>
             <div className="p-6 sm:p-7 rounded-[22px] bg-[#FAFAFA] dark:bg-[#18181C] border border-[#E8E8ED] dark:border-[#2C2C32]">
               <p className="text-sm sm:text-base text-[#1D1D1F] dark:text-[#D1D1D6] leading-relaxed">
                 {caseStudy.whyRag}
@@ -233,9 +230,9 @@ export const CaseStudyDetail: React.FC = () => {
         {/* 5. The solution */}
         {caseStudy.solution && caseStudy.solution.length > 0 && (
           <section className="mb-14 pb-14 border-b border-[#E8E8ED] dark:border-[#27272A]">
-            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-4">
+            <h2 className="text-2xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white mb-4">
               The solution
-            </span>
+            </h2>
             <div className="space-y-4">
               {caseStudy.solution.map((sol, idx) => (
                 <div
@@ -262,9 +259,9 @@ export const CaseStudyDetail: React.FC = () => {
         {/* 6. Results / testing / What testers changed */}
         {caseStudy.whatTestersChanged && caseStudy.whatTestersChanged.length > 0 && (
           <section className="mb-14 pb-14 border-b border-[#E8E8ED] dark:border-[#27272A]">
-            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-4">
+            <h2 className="text-2xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white mb-4">
               What testers changed
-            </span>
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {caseStudy.whatTestersChanged.map((t, idx) => (
                 <div
@@ -272,7 +269,7 @@ export const CaseStudyDetail: React.FC = () => {
                   className="p-5 rounded-2xl bg-[#FAFAFA] dark:bg-[#18181C] border border-[#E8E8ED] dark:border-[#2C2C32]"
                 >
                   {t.tester && (
-                    <div className="text-xs font-semibold text-[#86868B] dark:text-[#A1A1A8] uppercase tracking-wider mb-1">
+                    <div className="text-xs font-semibold text-[#86868B] dark:text-[#A1A1A8] mb-1">
                       {t.tester}
                     </div>
                   )}
@@ -288,9 +285,9 @@ export const CaseStudyDetail: React.FC = () => {
         {/* Evaluation and testing (Agent Copilot) */}
         {caseStudy.evaluationTesting && caseStudy.evaluationTesting.length > 0 && (
           <section className="mb-14 pb-14 border-b border-[#E8E8ED] dark:border-[#27272A]">
-            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-4">
+            <h2 className="text-2xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white mb-4">
               Evaluation and testing
-            </span>
+            </h2>
             <div className="space-y-3">
               {caseStudy.evaluationTesting.map((item, idx) => (
                 <p key={idx} className="text-sm sm:text-base text-[#6E6E73] dark:text-[#A8A8B2] leading-relaxed">
@@ -304,9 +301,9 @@ export const CaseStudyDetail: React.FC = () => {
         {/* Cost and value (Agent Copilot) */}
         {caseStudy.costAndValue && caseStudy.costAndValue.length > 0 && (
           <section className="mb-14 pb-14 border-b border-[#E8E8ED] dark:border-[#27272A]">
-            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-4">
+            <h2 className="text-2xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white mb-4">
               Cost and value
-            </span>
+            </h2>
             <div className="space-y-3">
               {caseStudy.costAndValue.map((item, idx) => (
                 <p key={idx} className="text-sm sm:text-base text-[#6E6E73] dark:text-[#A8A8B2] leading-relaxed">
@@ -320,9 +317,9 @@ export const CaseStudyDetail: React.FC = () => {
         {/* Go to market (People Like Me) */}
         {caseStudy.goToMarket && caseStudy.goToMarket.length > 0 && (
           <section className="mb-14 pb-14 border-b border-[#E8E8ED] dark:border-[#27272A]">
-            <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-4">
+            <h2 className="text-2xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white mb-4">
               Go-to-market
-            </span>
+            </h2>
             <div className="space-y-3">
               {caseStudy.goToMarket.map((item, idx) => (
                 <p key={idx} className="text-sm sm:text-base text-[#6E6E73] dark:text-[#A8A8B2] leading-relaxed">

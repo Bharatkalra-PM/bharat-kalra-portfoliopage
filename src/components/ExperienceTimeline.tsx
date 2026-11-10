@@ -96,9 +96,9 @@ export const ExperienceTimeline: React.FC = () => {
 
       {/* Skills cloud & Also section */}
       <div className="mt-14 pt-10 border-t border-[#E8E8ED] dark:border-[#27272A]">
-        <h4 className="text-xs font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase mb-6">
+        <h3 className="text-xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white mb-6">
           Skills
-        </h4>
+        </h3>
 
         <div className="space-y-4">
           {/* AI Skills */}

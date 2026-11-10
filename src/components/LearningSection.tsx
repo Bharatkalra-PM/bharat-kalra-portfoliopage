@@ -19,13 +19,13 @@ export const LearningSection: React.FC<LearningSectionProps> = ({ onOpenLightbox
             <div>
               <div className="flex items-center justify-between text-xs text-[#86868B] dark:text-[#A1A1A8] mb-3 font-medium">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-[#25252A] text-slate-800 dark:text-[#E4E4EB] font-semibold text-[11px]">
-                  <Award className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <Award className="w-3.5 h-3.5 text-[#1D1D1F] dark:text-white" />
                   {item.issuer}
                 </span>
                 <span className="font-mono text-xs text-stone-500 dark:text-stone-400 font-semibold">{item.period}</span>
               </div>
 
-              <h4 className="text-xl font-bold tracking-tight text-[#1D1D1F] dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <h4 className="text-xl font-bold tracking-tight text-[#1D1D1F] dark:text-white mb-3">
                 {item.title}
               </h4>
 
@@ -51,7 +51,7 @@ export const LearningSection: React.FC<LearningSectionProps> = ({ onOpenLightbox
                   onClick={() => onOpenLightbox(item.image!, `${item.title} Certificate - ${item.issuer}`)}
                   className="inline-flex items-center gap-2 text-xs font-semibold text-[#1D1D1F] dark:text-white hover:text-black dark:hover:text-neutral-200 py-1.5 px-3 rounded-lg bg-[#F5F5F8] dark:bg-[#222226] hover:bg-[#EAEAEF] dark:hover:bg-[#2C2C32] border border-[#E2E2E8] dark:border-[#33333A] transition-colors cursor-pointer"
                 >
-                  <Eye className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <Eye className="w-3.5 h-3.5 text-[#1D1D1F] dark:text-white" />
                   <span>View certificate (Lightbox)</span>
                 </button>
               ) : (
@@ -63,10 +63,14 @@ export const LearningSection: React.FC<LearningSectionProps> = ({ onOpenLightbox
                   href={item.verifyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1D1D1F] dark:text-white hover:underline transition-colors"
                 >
-                  <span>Verify credential</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>
+                    {item.title.toLowerCase().includes('yoga') || item.title.toLowerCase().includes('sthapna')
+                      ? 'Course page'
+                      : 'Verify credential'}
+                  </span>
+                  <ExternalLink className="w-3.5 h-3.5 text-[#86868B] dark:text-[#A1A1A8]" />
                 </a>
               )}
             </div>
@@ -74,11 +78,11 @@ export const LearningSection: React.FC<LearningSectionProps> = ({ onOpenLightbox
         ))}
       </div>
 
-      {/* Education - stylish list */}
+      {/* Education */}
       <div className="bg-white dark:bg-[#18181C] rounded-[26px] border border-[#E2E2E8] dark:border-[#2C2C32] p-6 sm:p-8 shadow-xs transition-colors">
         <div className="flex items-center gap-2 mb-4">
           <GraduationCap className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-          <h4 className="text-xs font-bold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase">
+          <h4 className="text-base font-semibold text-[#1D1D1F] dark:text-white">
             Education
           </h4>
         </div>

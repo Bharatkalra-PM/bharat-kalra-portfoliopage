@@ -86,7 +86,7 @@ export const hero = {
   title: "AI-Focused Product Manager",
   headline: "You don't build what your users ask for. You build for the problems they face.",
   subline: "8+ years building digital products across B2B and B2C. Now building AI products end to end, from discovery to delivery to distribution.",
-  statusPill: "Open to Product Management roles · B2B / B2C · Mumbai, Pune, Bengaluru, Remote or Outside India · Immediate joining",
+  statusPill: "Open to Product Management roles · B2B / B2C · Mumbai, Pune or Remote · Immediate joining",
   photo: "/images/profile.jpg",
   linkedinUrl: "https://www.linkedin.com/in/pm-bharat-kalra/",
   buttons: [
@@ -108,7 +108,7 @@ export const about = {
   leadLine: "What you say, how you say it, how it lands, and how it's acted upon. It all adds up.",
   body: [
     "I believe living in the grey keeps you open, able to hold more than one perspective at once. But it is the binary calls, the clear yes or no, that actually move things forward.",
-    "Over 8+ years, I have built and scaled digital products across B2B and B2C, mostly in insurance. The two roles that shaped me most were at Axis Max Life, where I owned partner bank journeys and the SME business insurance ecosystem end to end, and Tata AIA, where I led a ground-up D2C platform revamp on the Adobe stack (AEM, Analytics, Target) that doubled traffic and moved engagement and conversion meaningfully. Bharti AXA, in between the two, added a partnerships and B2B lens.",
+    "Over 8+ years, I have built and scaled digital products across B2B and B2C, mostly in insurance. The two roles that shaped me most were at Axis Max Life, where I owned partner bank journeys and the SME business insurance ecosystem end to end (expected additional revenue of ₹30 Cr), and Tata AIA, where I led a ground-up D2C platform revamp on the Adobe stack (AEM, Analytics, Target) that doubled traffic and moved engagement and conversion meaningfully. Bharti AXA, in between the two, added a partnerships and B2B lens.",
     "My goal is to build products that genuinely make a difference in someone's life, something with a real point of view rather than another version of what already exists.",
   ],
   threadLine: "Looking back, I keep returning to one idea: people change more easily with the right people beside them. It ran through a Duolingo case study in 2022, a community app in 2023, and People Like Me in 2026.",
@@ -642,15 +642,15 @@ export const writingAndInterests = {
   substackUrl: "https://open.substack.com/pub/bharatkalra",
   items: [
     {
-      title: "Substack: Personal Reflections",
-      label: "Personal essays and reflections on product, focus, and human decision-making.",
+      title: "Substack",
+      label: "Personal reflections.",
       url: "https://open.substack.com/pub/bharatkalra",
       tag: "Writing",
       icon: "substack",
     },
     {
       title: "AR/VR Blog",
-      label: "Started writing and analysing emerging spatial interfaces, immersive hardware and augmented reality.",
+      label: "Started a blog on AR/VR in 2017.",
       year: "2017",
       tag: "Spatial Tech",
       icon: "blog",
@@ -678,5 +678,6 @@ export const contact = {
 };
 
 export const footer = {
+  line1: "Bharat is a human and can make mistakes.",
   line2: "© 2026 Bharat Kalra",
 };

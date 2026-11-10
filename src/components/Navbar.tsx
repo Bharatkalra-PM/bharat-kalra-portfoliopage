@@ -4,14 +4,14 @@ import { Menu, X, FileText, Moon, Sun } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === '/';
 
-  // Default to dark mode unless explicitly set to 'light' in localStorage
+  // Default to light mode unless explicitly set to 'dark' in localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    const shouldBeDark = savedTheme !== 'light';
+    const shouldBeDark = savedTheme === 'dark';
     setIsDark(shouldBeDark);
     if (shouldBeDark) {
       document.documentElement.classList.add('dark');

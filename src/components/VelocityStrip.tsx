@@ -31,10 +31,7 @@ export const VelocityStrip: React.FC = () => {
       className="bg-[#1D1D1F] text-white rounded-[24px] p-6 sm:p-8 md:p-10 my-8 shadow-sm border border-[#2D2D30]"
     >
       <div className="max-w-3xl mb-8">
-        <span className="text-[11px] font-semibold tracking-widest text-[#86868B] uppercase block mb-2">
-          Velocity
-        </span>
-        <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-white leading-snug">
+        <h3 className="text-xl sm:text-2xl md:text-3xl font-serif font-normal tracking-tight text-white leading-snug">
           {velocity.heading}
         </h3>
       </div>
@@ -44,10 +41,10 @@ export const VelocityStrip: React.FC = () => {
           const widthPercent = (item.weeks / maxWeeks) * 100;
 
           const barGradients = [
-            'from-amber-400 via-amber-300 to-yellow-200',
+            'from-neutral-200 via-stone-300 to-white',
             'from-[#E08A68] via-[#D97757] to-[#F2DDD0]',
             'from-emerald-400 via-teal-300 to-emerald-200',
-            'from-blue-400 via-indigo-300 to-sky-200',
+            'from-neutral-300 via-neutral-100 to-white',
           ];
 
           return (

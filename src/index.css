@@ -15,6 +15,11 @@
   }
 }
 
+.font-serif,
+.font-display {
+  font-family: 'Newsreader', 'Instrument Serif', Georgia, serif;
+}
+
 /* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *,

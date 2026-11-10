@@ -1,113 +1,104 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { quotes } from '../data/content';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const QuoteCarousel: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const total = quotes.length;
+  const prevQuote = useCallback(() => {
+    setCurrentIndex((prev) => (prev === 0 ? quotes.length - 1 : prev - 1));
+  }, []);
 
-  const nextQuote = () => {
-    setCurrentIndex((prev) => (prev + 1) % total);
-  };
-
-  const prevQuote = () => {
-    setCurrentIndex((prev) => (prev - 1 + total) % total);
-  };
-
-  useEffect(() => {
-    if (isPaused) return;
-
-    timerRef.current = setInterval(() => {
-      nextQuote();
-    }, 6000);
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [currentIndex, isPaused]);
+  const nextQuote = useCallback(() => {
+    setCurrentIndex((prev) => (prev === quotes.length - 1 ? 0 : prev + 1));
+  }, []);
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowRight') {
-      nextQuote();
-    } else if (e.key === 'ArrowLeft') {
+    if (e.key === 'ArrowLeft') {
       prevQuote();
+    } else if (e.key === 'ArrowRight') {
+      nextQuote();
     }
   };
 
+  // Subtle auto-advance every 8 seconds when not hovered/paused
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      nextQuote();
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [isPaused, nextQuote]);
+
   return (
-    <div
+    <section
+      aria-label="How I think quotes"
+      className="bg-[#0C0C0E] text-white py-14 sm:py-16 md:py-20 border-y border-[#27272A] transition-colors relative overflow-hidden"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onKeyDown={handleKeyDown}
       tabIndex={0}
-      role="region"
-      aria-label="How I think quotes carousel"
-      aria-roledescription="carousel"
-      className="relative bg-gradient-to-br from-[#18181B] via-[#1F1F23] to-[#121214] text-white rounded-[26px] p-8 sm:p-12 md:p-14 my-10 border border-[#2D2D32] shadow-xl overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
-      {/* Ambient subtle glow */}
-      <div className="absolute top-0 right-1/4 w-72 h-72 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 flex items-center justify-between mb-8">
-        <div className="flex items-center gap-2.5">
-          <Quote className="w-5 h-5 text-amber-400" />
-          <span className="text-[11px] font-semibold tracking-widest text-[#A1A1A8] uppercase">
+      <div className="max-w-[1100px] mx-auto px-6 md:px-8">
+        {/* Section title in refined serif */}
+        <div className="text-center mb-8 sm:mb-10">
+          <h2 className="text-2xl sm:text-3xl font-serif font-normal tracking-tight text-white/90">
             How I think
-          </span>
-          <span className="text-xs font-mono font-medium text-stone-400 bg-white/5 px-2 py-0.5 rounded-full border border-white/10 ml-2">
-            0{currentIndex + 1} / 0{total}
-          </span>
+          </h2>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Quote display box */}
+        <div className="max-w-3xl mx-auto min-h-[140px] sm:min-h-[160px] flex items-center justify-center text-center px-4">
+          <p
+            key={currentIndex}
+            className="text-xl sm:text-2xl md:text-3xl font-serif italic text-white/95 leading-relaxed tracking-normal animate-in fade-in duration-500"
+          >
+            "{quotes[currentIndex]}"
+          </p>
+        </div>
+
+        {/* Carousel controls & pagination */}
+        <div className="flex items-center justify-center gap-6 mt-8 sm:mt-10">
           <button
             onClick={prevQuote}
             aria-label="Previous quote"
-            className="p-2 rounded-full bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white transition-colors"
+            className="p-2 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 text-white/80 hover:text-white transition-colors cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
+
+          {/* Dot pills */}
+          <div className="flex items-center gap-2">
+            {quotes.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                aria-label={`Go to quote ${idx + 1}`}
+                className={`transition-all duration-300 rounded-full cursor-pointer ${
+                  idx === currentIndex
+                    ? 'w-6 h-1.5 bg-white'
+                    : 'w-1.5 h-1.5 bg-white/30 hover:bg-white/60'
+                }`}
+              />
+            ))}
+          </div>
+
           <button
             onClick={nextQuote}
             aria-label="Next quote"
-            className="p-2 rounded-full bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white transition-colors"
+            className="p-2 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 text-white/80 hover:text-white transition-colors cursor-pointer"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
-      </div>
 
-      {/* Quote Display */}
-      <div className="min-h-[120px] sm:min-h-[140px] flex items-center justify-center py-2">
-        <p
-          key={currentIndex}
-          className="text-xl sm:text-2xl md:text-3xl font-normal tracking-tight text-white/95 text-center leading-relaxed transition-opacity duration-500 max-w-3xl"
-        >
-          "{quotes[currentIndex]}"
-        </p>
+        {/* Current position counter */}
+        <div className="text-center mt-3 text-[11px] font-mono text-white/40 tracking-wider">
+          {currentIndex + 1} of {quotes.length}
+        </div>
       </div>
-
-      {/* Dot Indicators */}
-      <div className="flex justify-center items-center gap-2 mt-8">
-        {quotes.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setCurrentIndex(idx)}
-            aria-label={`Go to quote ${idx + 1}`}
-            aria-current={currentIndex === idx ? 'true' : 'false'}
-            className={`transition-all duration-300 rounded-full ${
-              currentIndex === idx
-                ? 'w-6 h-2 bg-white'
-                : 'w-2 h-2 bg-[#48484A] hover:bg-[#86868B]'
-            }`}
-          />
-        ))}
-      </div>
-    </div>
+    </section>
   );
 };

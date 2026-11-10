@@ -19,15 +19,17 @@ export const MusicSection: React.FC<MusicSectionProps> = ({ onOpenLightbox }) =>
   return (
     <div className="bg-white dark:bg-[#18181C] rounded-[24px] border border-[#E8E8ED] dark:border-[#2C2C32] p-6 sm:p-8 md:p-10 mb-10 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-colors">
       <div className="max-w-2xl mb-8">
-        <span className="text-[11px] font-semibold tracking-widest text-[#86868B] dark:text-[#A1A1A8] uppercase block mb-2">
-          Music
-        </span>
-        <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1D1D1F] dark:text-white mb-4">
+        <h3 className="text-2xl sm:text-3xl font-serif font-normal tracking-tight text-[#1D1D1F] dark:text-white mb-3">
           {music.heading}
         </h3>
-        <p className="text-base text-[#6E6E73] dark:text-[#A8A8B2] leading-relaxed mb-6">
+        <p className="text-base text-[#6E6E73] dark:text-[#A8A8B2] leading-relaxed mb-4">
           {music.text}
         </p>
+        {music.pullQuote && (
+          <blockquote className="my-5 pl-4 border-l-2 border-[#1D1D1F] dark:border-white text-base sm:text-lg italic font-serif text-[#1D1D1F] dark:text-[#E4E4EB]">
+            "{music.pullQuote}"
+          </blockquote>
+        )}
       </div>
 
       {/* Gallery Header Controls */}

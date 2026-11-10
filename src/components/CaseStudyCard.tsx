@@ -154,16 +154,6 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy }) => {
                 className="w-full h-full object-contain sm:object-cover sm:object-top transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                 loading="lazy"
               />
-
-              {/* Status Pill on thumbnail - hidden on mobile to avoid overlapping slide copy, visible on sm+ */}
-              <div className="hidden sm:flex absolute bottom-3 left-4 right-4 z-10 items-center justify-between text-white text-xs">
-                <span className="font-medium bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
-                  {caseStudy.tags[0]} · {caseStudy.tags[1]}
-                </span>
-                <span className="font-semibold text-white/90 bg-black/70 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
-                  {caseStudy.meta.split('·')[1]?.trim() || '2026'}
-                </span>
-              </div>
             </div>
           ) : (
             renderCreativeCover()
@@ -178,7 +168,7 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy }) => {
           </div>
 
           {/* Title */}
-          <h3 className="text-2xl sm:text-[26px] font-semibold tracking-tight text-[#1D1D1F] dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+          <h3 className="text-2xl sm:text-[26px] font-semibold tracking-tight text-[#1D1D1F] dark:text-white mb-3 hover:text-black dark:hover:text-white transition-colors leading-tight">
             <Link to={`/work/${caseStudy.slug}`} className="hover:underline">
               {caseStudy.title}
             </Link>
@@ -217,7 +207,7 @@ export const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy }) => {
       <div className="px-6 pb-6 sm:px-8 sm:pb-8 pt-3 border-t border-[#F2F2F5] dark:border-[#222226] bg-[#FAFAFC]/50 dark:bg-[#141417]/80">
         <Link
           to={`/work/${caseStudy.slug}`}
-          className="inline-flex items-center justify-between w-full text-sm font-semibold text-[#1D1D1F] dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 py-1.5 transition-all"
+          className="inline-flex items-center justify-between w-full text-sm font-semibold text-[#1D1D1F] dark:text-white py-1.5 transition-all"
         >
           <span className="flex items-center gap-1.5">
             <span>Read full case study</span>

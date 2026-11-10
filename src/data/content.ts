@@ -678,6 +678,5 @@ export const contact = {
 };
 
 export const footer = {
-  line1: "Bharat is a human and can make mistakes.",
   line2: "© 2026 Bharat Kalra",
 };
